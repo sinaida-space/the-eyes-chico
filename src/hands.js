@@ -27,6 +27,7 @@ export async function startHands(router, glyphEl) {
   const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y, (a.z - b.z) || 0);
   let pickLatch = false, closeLatch = false, diveHeld = false, stopped = false;
   let lastVideoTime = -1;
+  let rawG = 'none', stableFor = 0;
 
   function classify(l) {
     const wrist = l[0], mcp = l[9];
@@ -49,6 +50,11 @@ export async function startHands(router, glyphEl) {
       const l = res.landmarks && res.landmarks[0];
       let g = 'none';
       if (l) g = classify(l);
+      // temporal debounce: hand-shape transitions flicker through other gestures
+      // for a frame or two — never fire a discrete action on a flicker
+      if (g === rawG) stableFor++; else { rawG = g; stableFor = 1; }
+      const need = (g === 'thumbs' || g === 'ily') ? 5 : 2;
+      if (stableFor < need) g = 'none';
       switch (g) {
         case 'palm':    // glide forward
           router.emit('steer', { x: 0, y: -1 });
