@@ -49,20 +49,26 @@ let running = false, exited = false, hands = null;
 let nearFlower = -1;
 let controlMode = 'keys';
 const LEGENDS = {
-  hands: '✋ STEER  ✊ DIVE  🤏 PICK  ☝ CLOSE  🖐 EXIT',
-  touch: 'DRAG=STEER · PINCH=DIVE · TAP=PICK/CLOSE',
-  keys:  'WASD=STEER · SCROLL=DIVE · E=PICK/CLOSE · ESC=EXIT',
+  hands:   '✋ FORWARD  ✊ TURN  ✌️ DIVE  👍 PICK  🤟 CLOSE',
+  touch:   'DRAG=STEER · PINCH=DIVE · TAP=PICK/CLOSE',
+  buttons: 'HOLD THE PADS · TAP FLOWER=PICK · TAP=CLOSE',
+  keys:    'WASD=STEER · SCROLL=DIVE · E=PICK/CLOSE · ESC=EXIT',
 };
 const DIVE_HINTS = {
-  hands: '▼ hold a FIST to descend into the field',
-  touch: '▼ pinch outward to descend into the field',
-  keys:  '▼ scroll down to descend into the field',
+  hands:   '▼ hold ✌️ to descend into the field',
+  touch:   '▼ pinch outward to descend into the field',
+  buttons: '▼ hold DIVE to descend into the field',
+  keys:    '▼ scroll down to descend into the field',
 };
 
 router.on('steer', v => { if (running && !ui.bubbleOpen) avatar.onSteer(v); });
 router.on('dive', a => { if (running && !ui.bubbleOpen) avatar.onDive(a * 0.9); });
 router.on('halt', () => { if (running && !ui.bubbleOpen) doExit(); });
 router.on('close', () => ui.closeBubble());
+// ✌️ hold: dives toward the far end from where you are — in from above, out from below
+let diveDir = 1;
+router.on('divestart', () => { diveDir = avatar.state.dive > 0.5 ? -1 : 1; });
+router.on('divehold', () => { if (running && !ui.bubbleOpen) avatar.onDive(diveDir * 0.055); });
 router.on('pick', () => {
   if (!running || ui.bubbleOpen) return;
   if (nearFlower >= 0) openFlower(nearFlower);
@@ -129,6 +135,13 @@ quality.onDowngrade = () => {
   loadProgress();
   ui.setCounter(visited.size, QUESTIONS.length);
   await ui.runBoot(quality.p.name, quality.canHands, quality.tier === 0 && !quality.forced);
+  const touchCapable = quality.isMobile || 'ontouchstart' in window
+    || new URLSearchParams(location.search).has('touch');
+  if (touchCapable) {
+    let saved = null;
+    try { saved = localStorage.getItem('eyes-touchmode'); } catch (e) {}
+    ui.initTouchChoice(saved);
+  }
   const mode = await ui.waitForEnter();
   ui.hideSplash();
   audio.start();
@@ -136,16 +149,22 @@ quality.onDowngrade = () => {
   ui.onExit(doExit);
 
   router.attachKeyboardMouse(canvas);
-  const touch = quality.isMobile || 'ontouchstart' in window;
-  if (touch) router.attachTouch(canvas);
-  controlMode = touch ? 'touch' : 'keys';
+  if (touchCapable) {
+    router.attachTouch(canvas);
+    controlMode = 'touch';
+    if (ui.touchMode === 'buttons') {
+      router.attachButtons();
+      controlMode = 'buttons';
+    }
+    if (ui.storageOK) { try { localStorage.setItem('eyes-touchmode', ui.touchMode); } catch (e) {} }
+  } else controlMode = 'keys';
   if (mode === 'hands') await startHandsFlow();
   else ui.setLegend(LEGENDS[controlMode]);
   running = true;
 })();
 
 // dev hook (console-only; the field forgives curiosity)
-window.__eyes = { openFlower, avatar, field, get visited() { return visited; } };
+window.__eyes = { openFlower, avatar, field, router, get visited() { return visited; } };
 
 // --- loop -------------------------------------------------------------------
 const clock = new THREE.Clock();
@@ -178,11 +197,12 @@ renderer.setAnimationLoop(() => {
         if (d2 < best) { best = d2; nearFlower = i; }
       });
       if (nearFlower >= 0) {
-        ui.setHint(controlMode === 'hands' ? '🤏 pinch — pick the question' : controlMode === 'touch' ? 'tap — pick the question' : 'E — pick the question');
+        ui.setHint({ hands: '👍 thumbs up — pick the question', touch: 'tap — pick the question',
+          buttons: 'PICK — take the question', keys: 'E — pick the question' }[controlMode]);
         hintShown = true;
       } else if (Math.abs(avatar.state.speed) < 0.2 && visited.size === 0) {
-        ui.setHint(controlMode === 'hands' ? 'move your palm — walk toward a glowing flower'
-          : controlMode === 'touch' ? 'drag — walk toward a glowing flower' : 'WASD — walk toward a glowing flower');
+        ui.setHint({ hands: '✋ open palm — glide toward a glowing flower', touch: 'drag — walk toward a glowing flower',
+          buttons: 'hold ▲ — walk toward a glowing flower', keys: 'WASD — walk toward a glowing flower' }[controlMode]);
         hintShown = true;
       } else if (hintShown) { ui.setHint(''); hintShown = false; }
     }
