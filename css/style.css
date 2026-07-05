@@ -64,19 +64,30 @@ b { color: var(--bone); }
 }
 #consent p { margin-bottom: .5em; max-width: 100ch; }
 
-/* HUD */
-#hud {
-  position: fixed; left: 0; right: 0; top: 0; z-index: 20;
-  display: flex; align-items: center; gap: 1.2em;
-  padding: 10px 16px; font-size: 17px;
-  color: var(--bone); text-shadow: 0 0 6px rgba(193, 18, 31, .4);
-  pointer-events: none;
-}
+/* HUD — retro game status bar */
+#hud { position: fixed; left: 0; right: 0; top: 0; z-index: 20; pointer-events: none; }
 #hud .btn { pointer-events: auto; }
-#counter { color: var(--red); }
-#hint { color: #b9aa9f; }
-#gesture-glyph { font-size: 24px; min-width: 1.4em; }
-.hud-right { margin-left: auto; }
+#hud-bar {
+  display: flex; align-items: center; gap: 1.1em;
+  padding: 7px 14px; font-size: 16px;
+  background: linear-gradient(#120307, #0a0205);
+  border-bottom: 2px solid var(--red);
+  box-shadow: 0 2px 0 #000, 0 4px 14px rgba(0,0,0,.7);
+  color: var(--bone); letter-spacing: .04em;
+  white-space: nowrap; overflow: hidden;
+}
+#counter { color: var(--red); background: #000; border: 1px solid var(--red-dim); padding: 1px 8px; }
+#legend { color: #cfc4bb; overflow: hidden; text-overflow: ellipsis; }
+#gesture-glyph { font-size: 20px; min-width: 1.3em; }
+.hud-right { margin-left: auto; display: flex; gap: .5em; }
+#hint-row { text-align: center; padding-top: 10px; }
+#hint {
+  display: inline-block; color: var(--bone);
+  background: rgba(5,0,3,.75); border: 1px solid var(--red-dim);
+  padding: 2px 14px; font-size: 17px;
+  text-shadow: 0 0 8px rgba(193,18,31,.5);
+}
+#hint:empty { display: none; }
 
 /* question bubble — bioluminescent cloud */
 #bubble {
