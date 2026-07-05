@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face { font-family: 'VT323'; src: url('../assets/vt323.woff2') format('woff2'); }
+* { margin: 0; padding: 0; }
+body { width: 1200px; height: 630px; background: #050003; overflow: hidden;
+  font-family: 'VT323', monospace; position: relative; }
+#bg { position: absolute; inset: 0; background: url('frames/f0300.jpg') no-repeat;
+  background-size: 1200px 2133px; background-position: 0 -560px; filter: brightness(1.05); }
+#shade { position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(5,0,3,.72) 0%, rgba(5,0,3,.15) 45%, rgba(5,0,3,.82) 100%); }
+.scan { position: absolute; inset: 0;
+  background: repeating-linear-gradient(0deg, transparent 0 3px, rgba(0,0,0,.28) 3px 6px); }
+#txt { position: absolute; left: 70px; top: 64px; }
+#prompt { color: #f2ede4; font-size: 34px; text-shadow: 0 0 12px rgba(193,18,31,.6); }
+#title { color: #c1121f; font-size: 118px; line-height: .95; margin-top: 6px;
+  text-shadow: 5px 0 0 rgba(242,237,228,.22), -5px 0 0 rgba(193,18,31,.5), 0 0 46px rgba(193,18,31,.85); }
+#bottom { position: absolute; left: 70px; bottom: 54px; }
+#sub { color: #f2ede4; font-size: 38px; text-shadow: 0 0 14px rgba(0,0,0,.9); }
+#url { color: #8a7f78; font-size: 30px; margin-top: 8px; }
+</style></head>
+<body>
+<div id="bg"></div><div id="shade"></div><div class="scan"></div>
+<div id="txt">
+  <div id="prompt">C:\&gt; the field is watching.</div>
+  <div id="title">the eyes, chico</div>
+</div>
+<div id="bottom">
+  <div id="sub">50 questions only you can answer. nothing is recorded.</div>
+  <div id="url">an interactive installation by sin.ai.da</div>
+</div>
+</body></html>

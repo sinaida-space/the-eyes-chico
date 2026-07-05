@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<!-- pixel eye + DOS cursor, palette: #050003 / #c1121f / #f2ede4 -->
+<rect width="16" height="16" fill="#050003"/>
+<g fill="#c1121f">
+  <rect x="5" y="3" width="6" height="1"/>
+  <rect x="3" y="4" width="2" height="1"/><rect x="11" y="4" width="2" height="1"/>
+  <rect x="2" y="5" width="1" height="4"/><rect x="13" y="5" width="1" height="4"/>
+  <rect x="5" y="5" width="6" height="1"/>
+  <rect x="5" y="6" width="2" height="2"/><rect x="9" y="6" width="2" height="2"/>
+  <rect x="5" y="8" width="6" height="1"/>
+  <rect x="3" y="9" width="2" height="1"/><rect x="11" y="9" width="2" height="1"/>
+  <rect x="5" y="10" width="6" height="1"/>
+  <rect x="2" y="13" width="3" height="2"/>
+</g>
+<g fill="#f2ede4">
+  <rect x="5" y="4" width="6" height="1"/>
+  <rect x="3" y="5" width="2" height="4"/><rect x="11" y="5" width="2" height="4"/>
+  <rect x="3" y="9" width="0" height="0"/>
+  <rect x="5" y="9" width="6" height="1"/>
+</g>
+<rect x="7" y="6" width="2" height="2" fill="#050003"/>
+</svg>
