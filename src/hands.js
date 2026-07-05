@@ -24,17 +24,19 @@ export async function startHands(router, glyphEl) {
   await video.play();
 
   const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y, (a.z - b.z) || 0);
-  let palmSince = 0, pinchLatch = false, stopped = false;
+  let palmSince = 0, pinchLatch = false, pointLatch = false, stopped = false;
   let lastVideoTime = -1;
 
   function classify(l) {
     const wrist = l[0], mcp = l[9];
     const size = dist(wrist, mcp) || 1e-4; // scale reference
-    const tips = [8, 12, 16, 20];
-    let curled = 0;
-    for (const t of tips) if (dist(l[t], wrist) < dist(l[t - 2], wrist) + size * 0.1) curled++;
+    const isCurled = t => dist(l[t], wrist) < dist(l[t - 2], wrist) + size * 0.1;
+    const c = { i: isCurled(8), m: isCurled(12), r: isCurled(16), p: isCurled(20) };
+    const curled = c.i + c.m + c.r + c.p;
     const pinch = dist(l[4], l[8]) < size * 0.45;
     if (pinch && curled < 3) return 'pinch';
+    // index up, rest curled, fingertip above the wrist → "let it sink"
+    if (!c.i && c.m && c.r && c.p && l[8].y < wrist.y - size * 0.5) return 'point';
     if (curled >= 3) return 'fist';
     return 'palm';
   }
@@ -68,7 +70,12 @@ export async function startHands(router, glyphEl) {
           if (!pinchLatch) { router.emit('pick'); pinchLatch = true; }
           glyphEl.textContent = '🤏';
           palmSince = 0;
+        } else if (g === 'point') {
+          if (!pointLatch) { router.emit('close'); pointLatch = true; }
+          glyphEl.textContent = '☝';
+          palmSince = 0;
         }
+        if (g !== 'point') pointLatch = false;
       } else {
         glyphEl.textContent = '·';
         router.emit('steer', { x: 0, y: 0 });

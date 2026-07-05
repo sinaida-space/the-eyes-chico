@@ -108,6 +108,12 @@ b { color: var(--bone); }
 }
 #bubble-text { font-size: clamp(21px, 3.2vw, 28px); color: var(--bone);
   text-shadow: 0 0 14px rgba(242,237,228,.55); }
+#bubble-close { margin-top: 14px; }
+#bubble-cloud.sinking {
+  transition: transform .65s cubic-bezier(.5, 0, .9, .4), opacity .6s ease-in;
+  transform: translateY(70vh) scale(.75) !important;
+  opacity: 0;
+}
 @keyframes cloudbreathe {
   0%, 100% { transform: scale(1); border-radius: 48% 52% 55% 45% / 55% 48% 52% 45%; }
   50% { transform: scale(1.03); border-radius: 52% 48% 45% 55% / 48% 55% 45% 52%; }

@@ -49,9 +49,9 @@ let running = false, exited = false, hands = null;
 let nearFlower = -1;
 let controlMode = 'keys';
 const LEGENDS = {
-  hands: '✋ PALM=STEER  ✊ FIST=DIVE  🤏 PINCH=PICK  🖐 HOLD=EXIT',
-  touch: 'DRAG=STEER · PINCH=DIVE · TAP FLOWER=PICK',
-  keys:  'WASD=STEER · SCROLL=DIVE · E=PICK · ESC=EXIT',
+  hands: '✋ STEER  ✊ DIVE  🤏 PICK  ☝ CLOSE  🖐 EXIT',
+  touch: 'DRAG=STEER · PINCH=DIVE · TAP=PICK/CLOSE',
+  keys:  'WASD=STEER · SCROLL=DIVE · E=PICK/CLOSE · ESC=EXIT',
 };
 const DIVE_HINTS = {
   hands: '▼ hold a FIST to descend into the field',
@@ -62,6 +62,7 @@ const DIVE_HINTS = {
 router.on('steer', v => { if (running && !ui.bubbleOpen) avatar.onSteer(v); });
 router.on('dive', a => { if (running && !ui.bubbleOpen) avatar.onDive(a * 0.9); });
 router.on('halt', () => { if (running && !ui.bubbleOpen) doExit(); });
+router.on('close', () => ui.closeBubble());
 router.on('pick', () => {
   if (!running || ui.bubbleOpen) return;
   if (nearFlower >= 0) openFlower(nearFlower);
@@ -69,17 +70,29 @@ router.on('pick', () => {
 
 async function openFlower(i) {
   avatar.halt();
-  const isNew = !visited.has(i);
   post.burst(1);
   audio.flowerTone();
   await ui.showQuestion(QUESTIONS[i]);
-  if (isNew) {
-    visited.add(i);
-    field.markVisited(i);
-    saveProgress();
-    ui.setCounter(visited.size, QUESTIONS.length);
-    if (visited.size === QUESTIONS.length) { ui.finale(); sky.setCalm(1); post.burst(1.5); }
+  visited.add(i);
+  field.markVisited(i);
+  saveProgress();
+  ui.setCounter(visited.size, QUESTIONS.length);
+  if (visited.size === QUESTIONS.length) { ui.finale(); sky.setCalm(1); post.burst(1.5); }
+}
+
+async function startHandsFlow() {
+  ui.setHint('starting hand tracking…');
+  try {
+    const { startHands } = await import('./hands.js');
+    hands = await startHands(router, ui.glyphEl);
+    controlMode = 'hands';
+    ui.setHint('');
+  } catch (e) {
+    console.warn('hand tracking failed, falling back:', e);
+    ui.setHint('hand tracking unavailable — keys/touch active');
+    setTimeout(() => ui.setHint(''), 5000);
   }
+  ui.setLegend(LEGENDS[controlMode]);
 }
 
 async function doExit() {
@@ -87,7 +100,13 @@ async function doExit() {
   exited = true; running = false;
   avatar.halt();
   ui.closeBubble();
-  await ui.showExit(visited.size, QUESTIONS.length);
+  const choice = await ui.showExit(visited.size, QUESTIONS.length);
+  if (choice === 'welcome') {
+    ui.showSplash();
+    const mode = await ui.waitForEnter();
+    ui.hideSplash();
+    if (mode === 'hands' && !hands) await startHandsFlow();
+  }
   exited = false; running = true;
 }
 
@@ -109,7 +128,7 @@ quality.onDowngrade = () => {
   await ui.initConsent();
   loadProgress();
   ui.setCounter(visited.size, QUESTIONS.length);
-  await ui.runBoot(quality.p.name, quality.canHands);
+  await ui.runBoot(quality.p.name, quality.canHands, quality.tier === 0 && !quality.forced);
   const mode = await ui.waitForEnter();
   ui.hideSplash();
   audio.start();
@@ -120,22 +139,13 @@ quality.onDowngrade = () => {
   const touch = quality.isMobile || 'ontouchstart' in window;
   if (touch) router.attachTouch(canvas);
   controlMode = touch ? 'touch' : 'keys';
-  if (mode === 'hands') {
-    ui.setHint('starting hand tracking…');
-    try {
-      const { startHands } = await import('./hands.js');
-      hands = await startHands(router, ui.glyphEl);
-      controlMode = 'hands';
-      ui.setHint('');
-    } catch (e) {
-      console.warn('hand tracking failed, falling back:', e);
-      ui.setHint('hand tracking unavailable — keys/touch active');
-      setTimeout(() => ui.setHint(''), 5000);
-    }
-  }
-  ui.setLegend(LEGENDS[controlMode]);
+  if (mode === 'hands') await startHandsFlow();
+  else ui.setLegend(LEGENDS[controlMode]);
   running = true;
 })();
+
+// dev hook (console-only; the field forgives curiosity)
+window.__eyes = { openFlower, avatar, field, get visited() { return visited; } };
 
 // --- loop -------------------------------------------------------------------
 const clock = new THREE.Clock();
@@ -163,12 +173,12 @@ renderer.setAnimationLoop(() => {
       nearFlower = -1;
       let best = 36; // 6 units squared
       field.questionPositions.forEach((p, i) => {
+        if (visited.has(i)) return; // sunk — the abyss keeps it
         const d2 = tmp.subVectors(p, avatar.position).lengthSq();
         if (d2 < best) { best = d2; nearFlower = i; }
       });
       if (nearFlower >= 0) {
-        ui.setHint(visited.has(nearFlower) ? 'a question you already carry — pick to reread'
-          : (controlMode === 'hands' ? '🤏 pinch — pick the question' : controlMode === 'touch' ? 'tap — pick the question' : 'E — pick the question'));
+        ui.setHint(controlMode === 'hands' ? '🤏 pinch — pick the question' : controlMode === 'touch' ? 'tap — pick the question' : 'E — pick the question');
         hintShown = true;
       } else if (Math.abs(avatar.state.speed) < 0.2 && visited.size === 0) {
         ui.setHint(controlMode === 'hands' ? 'move your palm — walk toward a glowing flower'

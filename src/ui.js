@@ -60,7 +60,7 @@ export class UI {
   }
 
   // ---- splash ----
-  async runBoot(tierName, canHands) {
+  async runBoot(tierName, canHands, weak = false) {
     const log = $('bootlog');
     for (const line of BOOT_LINES) {
       const el = document.createElement('div');
@@ -77,6 +77,14 @@ export class UI {
     }
     $('tier-report').textContent =
       `detected tier: ${tierName}` + (canHands ? ' · camera available for hand tracking' : ' · touch/keyboard mode');
+    if (weak) {
+      const w = document.createElement('p');
+      w.innerHTML = 'C:\\&gt; weak GPU detected — you will get the ESSENTIAL version: fewer eyes, '
+        + 'a calmer sky, the same ritual. we do not recommend the full version on this machine, '
+        + 'but you can <a href="?tier=2">try it anyway →</a>';
+      w.style.color = '#c1121f';
+      $('tier-report').after(w);
+    }
     if (canHands) { $('controls-hand').classList.remove('hidden'); $('btn-enter-hands').classList.remove('hidden'); }
     $('splash-body').classList.remove('hidden');
   }
@@ -92,6 +100,7 @@ export class UI {
   }
 
   hideSplash() { $('splash').classList.add('hidden'); $('hud').classList.remove('hidden'); }
+  showSplash() { $('splash').classList.remove('hidden'); $('hud').classList.add('hidden'); }
 
   // ---- HUD ----
   setCounter(n, total) { $('counter').textContent = `${n}/${total}`; }
@@ -108,19 +117,30 @@ export class UI {
   showQuestion(text) {
     $('bubble-text').textContent = text;
     $('bubble').classList.remove('hidden');
+    const cloud = $('bubble-cloud');
+    cloud.classList.remove('sinking');
     return new Promise(res => {
       setTimeout(() => { // grace so the opening tap doesn't close it
+        let closed = false;
         const close = () => {
-          $('bubble').classList.add('hidden');
+          if (closed) return;
+          closed = true;
           removeEventListener('pointerdown', close); removeEventListener('keydown', close);
-          res();
+          this._closeBubble = null;
+          cloud.classList.add('sinking'); // into the abyss
+          setTimeout(() => {
+            $('bubble').classList.add('hidden');
+            cloud.classList.remove('sinking');
+            res();
+          }, 660);
         };
+        $('bubble-close').onclick = close;
         addEventListener('pointerdown', close); addEventListener('keydown', close);
         this._closeBubble = close;
       }, 600);
     });
   }
-  closeBubble() { if (this._closeBubble) { this._closeBubble(); this._closeBubble = null; } }
+  closeBubble() { if (this._closeBubble) this._closeBubble(); }
   get bubbleOpen() { return !$('bubble').classList.contains('hidden'); }
 
   finale() {
@@ -136,7 +156,11 @@ export class UI {
       $('btn-return').onclick = () => {
         $('exit-screen').classList.add('hidden');
         $('hud').classList.remove('hidden');
-        res();
+        res('field');
+      };
+      $('btn-welcome').onclick = () => {
+        $('exit-screen').classList.add('hidden');
+        res('welcome');
       };
     });
   }
