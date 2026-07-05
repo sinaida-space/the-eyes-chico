@@ -1,7 +1,7 @@
 // Input router: capability probe picks a mode; every mode emits the same events.
 //   steer {x:-1..1, y:-1..1} · dive (±amount) · pick · halt
 export class InputRouter {
-  constructor() { this._h = { steer: [], dive: [], pick: [], halt: [] }; this.mode = 'keys'; }
+  constructor() { this._h = { steer: [], dive: [], pick: [], halt: [], close: [] }; this.mode = 'keys'; }
   on(ev, cb) { this._h[ev].push(cb); }
   emit(ev, arg) { for (const cb of this._h[ev]) cb(arg); }
 
