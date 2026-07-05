@@ -2,6 +2,11 @@
 // reference image: deep-red vortex ringed around a star-filled void.
 // Rendered into a low-res render target each frame and used as scene.background,
 // so the march cost is independent of screen resolution.
+
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2026 @YoheiNishitsuji
+// [LICENSE] https://opensource.org/licenses/MIT
+
 import * as THREE from 'three';
 
 const FRAG = /* glsl */`
