@@ -3,8 +3,8 @@
 // Rendered into a low-res render target each frame and used as scene.background,
 // so the march cost is independent of screen resolution.
 
-// SPDX-License-Identifier: MIT
-// Copyright (c) 2026 @YoheiNishitsuji
+// Based on source that has SPDX-License-Identifier: MIT
+// Source Copyright (c) 2026 @YoheiNishitsuji
 // [LICENSE] https://opensource.org/licenses/MIT
 
 import * as THREE from 'three';
