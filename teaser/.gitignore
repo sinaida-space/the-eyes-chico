@@ -1,0 +1,5 @@
+.DS_Store
+teaser/node_modules/
+teaser/frames/
+teaser/audio.wav
+teaser/*.mp4

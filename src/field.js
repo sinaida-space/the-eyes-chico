@@ -248,6 +248,7 @@ export function createField(scene, quality) {
 
   return {
     questionPositions,
+    _eyes: eyes, // instance data exposed for the teaser renderer
     markVisited(i, on = true) { visited[i] = on ? 1 : 0; aVisited.needsUpdate = true; },
     setAvatar(v) { uAvatar.value.copy(v); },
     update(t) { uTime.value = t; },
