@@ -49,10 +49,10 @@ let running = false, exited = false, hands = null;
 let nearFlower = -1;
 let controlMode = 'keys';
 const LEGENDS = {
-  hands:   '✋ FORWARD  ✊ TURN  ✌️ DIVE  👍 PICK  🤟 CLOSE',
-  touch:   'DRAG=STEER · PINCH=DIVE · TAP=PICK/CLOSE',
-  buttons: 'HOLD THE PADS · TAP FLOWER=PICK · TAP=CLOSE',
-  keys:    'WASD=STEER · SCROLL=DIVE · E=PICK/CLOSE · ESC=EXIT',
+  hands:   '✋ FORWARD  ✊ TURN  ✌️ DIVE  👍 PICK  🤟 FORGET',
+  touch:   'DRAG=STEER · PINCH=DIVE · TAP=PICK/FORGET',
+  buttons: 'HOLD THE PADS · TAP FLOWER=PICK · TAP=FORGET',
+  keys:    'WASD=STEER · SCROLL=DIVE · E=PICK/FORGET · ESC=EXIT',
 };
 const DIVE_HINTS = {
   hands:   '▼ hold ✌️ to descend into the field',
