@@ -39,15 +39,18 @@
     <h3>// HOW TO MOVE</h3>
     <div id="controls-hand" class="hidden">
       <p><b>HAND TRACKING</b> (your camera, processed locally — nothing leaves this device)</p>
-      <p>✋ OPEN PALM, move it — steer the figure (center = rest)<br>
-      ✊ FIST, hold — dive / accelerate down into the field<br>
-      🤏 PINCH near a glowing flower — pick its question<br>
-      ☝ INDEX FINGER UP — close a question, let it sink<br>
-      🖐 FLAT PALM held 1s — pause / exit menu</p>
+      <p>✋ OPEN PALM — glide forward<br>
+      ✊ FIST, hold — turn (always clockwise, release to stop)<br>
+      ✌️ PEACE, hold — dive into the field / rise back out<br>
+      👍 THUMBS UP near a glowing flower — pick its question<br>
+      🤟 I LOVE YOU — close the question, let it sink forever</p>
     </div>
     <div id="controls-fallback">
       <p><b>TOUCH:</b> drag = steer · pinch = dive/rise · tap glowing flower = pick · tap = close a question<br>
       <b>KEYS/MOUSE:</b> WASD or arrows = steer · mouse wheel = dive/rise · E / click = pick · any key closes a question · ESC = exit menu</p>
+      <p id="touch-choice" class="hidden"><b>TOUCH CONTROLS:</b>
+        <button id="tc-swipe" class="btn mini">SWIPE</button>
+        <button id="tc-buttons" class="btn mini dim">ON-SCREEN BUTTONS</button></p>
     </div>
 
     <h3>// YOUR MACHINE</h3>
@@ -96,6 +99,21 @@
     </span>
   </div>
   <div id="hint-row"><span id="hint"></span></div>
+  <div id="pad" class="hidden">
+    <div class="pad-cluster">
+      <button class="btn pad-b" id="pad-fwd">▲</button>
+      <div class="pad-row">
+        <button class="btn pad-b" id="pad-left">◀</button>
+        <button class="btn pad-b" id="pad-back">▼</button>
+        <button class="btn pad-b" id="pad-right">▶</button>
+      </div>
+    </div>
+    <div class="pad-cluster pad-right-side">
+      <button class="btn pad-b" id="pad-dive">DIVE</button>
+      <button class="btn pad-b" id="pad-rise">RISE</button>
+      <button class="btn pad-b" id="pad-pick">PICK</button>
+    </div>
+  </div>
 </div>
 
 <!-- question bubble -->

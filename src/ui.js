@@ -89,6 +89,19 @@ export class UI {
     $('splash-body').classList.remove('hidden');
   }
 
+  // touch users choose swipe vs on-screen buttons on the splash
+  initTouchChoice(saved) {
+    this.touchMode = saved === 'buttons' ? 'buttons' : 'swipe';
+    $('touch-choice').classList.remove('hidden');
+    const upd = () => {
+      $('tc-swipe').classList.toggle('dim', this.touchMode !== 'swipe');
+      $('tc-buttons').classList.toggle('dim', this.touchMode !== 'buttons');
+    };
+    $('tc-swipe').onclick = () => { this.touchMode = 'swipe'; upd(); };
+    $('tc-buttons').onclick = () => { this.touchMode = 'buttons'; upd(); };
+    upd();
+  }
+
   waitForEnter() {
     return new Promise(res => {
       $('btn-enter').onclick = () => res('fallback');
