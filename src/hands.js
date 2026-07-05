@@ -1,7 +1,8 @@
 // MediaPipe hand tracking → router events. Loaded lazily, only after the user
 // explicitly chooses hand mode. All processing stays in the browser; the model
 // files are fetched from jsDelivr/Google CDN (disclosed on splash + privacy page).
-// Grammar: open palm = steer · held fist = dive · pinch = pick · flat palm 1s = halt.
+// Grammar: ✋ palm = forward · ✊ fist = turn right · ✌️ peace = dive in/out ·
+//          👍 thumbs up = pick · 🤟 I-love-you = close the question.
 const CDN = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14';
 
 export async function startHands(router, glyphEl) {
@@ -24,7 +25,7 @@ export async function startHands(router, glyphEl) {
   await video.play();
 
   const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y, (a.z - b.z) || 0);
-  let palmSince = 0, pinchLatch = false, pointLatch = false, stopped = false;
+  let pickLatch = false, closeLatch = false, diveHeld = false, stopped = false;
   let lastVideoTime = -1;
 
   function classify(l) {
@@ -32,13 +33,12 @@ export async function startHands(router, glyphEl) {
     const size = dist(wrist, mcp) || 1e-4; // scale reference
     const isCurled = t => dist(l[t], wrist) < dist(l[t - 2], wrist) + size * 0.1;
     const c = { i: isCurled(8), m: isCurled(12), r: isCurled(16), p: isCurled(20) };
-    const curled = c.i + c.m + c.r + c.p;
-    const pinch = dist(l[4], l[8]) < size * 0.45;
-    if (pinch && curled < 3) return 'pinch';
-    // index up, rest curled, fingertip above the wrist → "let it sink"
-    if (!c.i && c.m && c.r && c.p && l[8].y < wrist.y - size * 0.5) return 'point';
-    if (curled >= 3) return 'fist';
-    return 'palm';
+    const thumbUp = l[4].y < wrist.y - size * 0.35 && dist(l[4], l[9]) > size * 0.55;
+    if (!c.i && !c.m && c.r && c.p) return 'victory';           // ✌️
+    if (!c.i && c.m && c.r && !c.p) return 'ily';               // 🤟
+    if (c.i && c.m && c.r && c.p) return thumbUp ? 'thumbs' : 'fist'; // 👍 / ✊
+    if (!c.i && !c.m && !c.r && !c.p) return 'palm';            // ✋
+    return 'none';
   }
 
   function loop(now) {
@@ -47,40 +47,35 @@ export async function startHands(router, glyphEl) {
       lastVideoTime = video.currentTime;
       const res = lm.detectForVideo(video, now);
       const l = res.landmarks && res.landmarks[0];
-      if (l) {
-        const g = classify(l);
-        const cx = 1 - l[9].x, cy = l[9].y; // mirror x
-        if (g === 'palm') {
-          // dead zone in the middle 20%
-          const dx = (cx - 0.5) * 2, dy = (cy - 0.5) * 2;
-          const dead = v => Math.abs(v) < 0.2 ? 0 : Math.sign(v) * (Math.abs(v) - 0.2) / 0.8;
-          router.emit('steer', { x: dead(dx) * 1.4, y: dead(dy) * 1.4 });
-          glyphEl.textContent = '✋';
-          if (Math.abs(dead(dx)) < 0.01 && Math.abs(dead(dy)) < 0.01) {
-            if (!palmSince) palmSince = now;
-            else if (now - palmSince > 1000) { router.emit('halt'); palmSince = 0; }
-          } else palmSince = 0;
-          pinchLatch = false;
-        } else if (g === 'fist') {
+      let g = 'none';
+      if (l) g = classify(l);
+      switch (g) {
+        case 'palm':    // glide forward
+          router.emit('steer', { x: 0, y: -1 });
+          glyphEl.textContent = '✋'; break;
+        case 'fist':    // turn — always clockwise, release to stop
+          router.emit('steer', { x: 0.75, y: 0 });
+          glyphEl.textContent = '✊'; break;
+        case 'victory': // dive in / out, hold to travel
+          if (!diveHeld) { router.emit('divestart'); diveHeld = true; }
+          router.emit('divehold');
           router.emit('steer', { x: 0, y: 0 });
-          router.emit('dive', 0.05);
-          glyphEl.textContent = '✊';
-          palmSince = 0; pinchLatch = false;
-        } else if (g === 'pinch') {
-          if (!pinchLatch) { router.emit('pick'); pinchLatch = true; }
-          glyphEl.textContent = '🤏';
-          palmSince = 0;
-        } else if (g === 'point') {
-          if (!pointLatch) { router.emit('close'); pointLatch = true; }
-          glyphEl.textContent = '☝';
-          palmSince = 0;
-        }
-        if (g !== 'point') pointLatch = false;
-      } else {
-        glyphEl.textContent = '·';
-        router.emit('steer', { x: 0, y: 0 });
-        palmSince = 0;
+          glyphEl.textContent = '✌️'; break;
+        case 'thumbs':  // pick the question
+          if (!pickLatch) { router.emit('pick'); pickLatch = true; }
+          router.emit('steer', { x: 0, y: 0 });
+          glyphEl.textContent = '👍'; break;
+        case 'ily':     // close it, let it sink
+          if (!closeLatch) { router.emit('close'); closeLatch = true; }
+          router.emit('steer', { x: 0, y: 0 });
+          glyphEl.textContent = '🤟'; break;
+        default:
+          router.emit('steer', { x: 0, y: 0 });
+          glyphEl.textContent = l ? '·' : '';
       }
+      if (g !== 'thumbs') pickLatch = false;
+      if (g !== 'ily') closeLatch = false;
+      if (g !== 'victory') diveHeld = false;
     }
     requestAnimationFrame(loop);
   }
