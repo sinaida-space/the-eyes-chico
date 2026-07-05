@@ -12,6 +12,7 @@ export class Quality {
     const forced = new URLSearchParams(location.search).get('tier');
     let saved = null;
     try { saved = localStorage.getItem('eyes-tier'); } catch (e) { /* storage blocked */ }
+    this.forced = forced !== null;
     if (forced !== null) this.tier = +forced;
     else if (saved !== null) this.tier = +saved;
     else this.tier = this.detect();

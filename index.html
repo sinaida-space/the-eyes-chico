@@ -42,11 +42,12 @@
       <p>✋ OPEN PALM, move it — steer the figure (center = rest)<br>
       ✊ FIST, hold — dive / accelerate down into the field<br>
       🤏 PINCH near a glowing flower — pick its question<br>
+      ☝ INDEX FINGER UP — close a question, let it sink<br>
       🖐 FLAT PALM held 1s — pause / exit menu</p>
     </div>
     <div id="controls-fallback">
-      <p><b>TOUCH:</b> drag = steer · pinch = dive/rise · tap glowing flower = pick<br>
-      <b>KEYS/MOUSE:</b> WASD or arrows = steer · mouse wheel = dive/rise · E / click = pick · ESC = exit menu</p>
+      <p><b>TOUCH:</b> drag = steer · pinch = dive/rise · tap glowing flower = pick · tap = close a question<br>
+      <b>KEYS/MOUSE:</b> WASD or arrows = steer · mouse wheel = dive/rise · E / click = pick · any key closes a question · ESC = exit menu</p>
     </div>
 
     <h3>// YOUR MACHINE</h3>
@@ -99,7 +100,8 @@
 
 <!-- question bubble -->
 <div id="bubble" class="hidden"><div id="bubble-cloud"><p id="bubble-text"></p>
-<p class="dim tiny">think. don't type. anything closes this.</p></div></div>
+<p class="dim tiny">think. don't type. a closed question sinks and never resurfaces.</p>
+<button id="bubble-close" class="btn">let it sink ▼</button></div></div>
 
 <!-- exit screen -->
 <div id="exit-screen" class="term hidden">
@@ -112,7 +114,8 @@
     <p><a class="btn" href="https://open.spotify.com/playlist/1lnhhzpja7u0aP2uiccYW2" target="_blank" rel="noopener">▶ OPEN THE PLAYLIST</a></p>
     <p><a href="https://sinaida.eu" target="_blank" rel="noopener">sinaida.eu</a> ·
        <a href="https://www.instagram.com/sin.ai.da/" target="_blank" rel="noopener">@sin.ai.da</a></p>
-    <p><button id="btn-return" class="btn dim">RE-ENTER THE FIELD</button></p>
+    <p><button id="btn-return" class="btn dim">RE-ENTER THE FIELD</button>
+       <button id="btn-welcome" class="btn dim">◀ BACK TO THE TERMINAL</button></p>
   </div>
 </div>
 
