@@ -47,6 +47,17 @@ function saveProgress() {
 // --- state ------------------------------------------------------------------
 let running = false, exited = false, hands = null;
 let nearFlower = -1;
+let controlMode = 'keys';
+const LEGENDS = {
+  hands: '✋ PALM=STEER  ✊ FIST=DIVE  🤏 PINCH=PICK  🖐 HOLD=EXIT',
+  touch: 'DRAG=STEER · PINCH=DIVE · TAP FLOWER=PICK',
+  keys:  'WASD=STEER · SCROLL=DIVE · E=PICK · ESC=EXIT',
+};
+const DIVE_HINTS = {
+  hands: '▼ hold a FIST to descend into the field',
+  touch: '▼ pinch outward to descend into the field',
+  keys:  '▼ scroll down to descend into the field',
+};
 
 router.on('steer', v => { if (running && !ui.bubbleOpen) avatar.onSteer(v); });
 router.on('dive', a => { if (running && !ui.bubbleOpen) avatar.onDive(a * 0.9); });
@@ -106,21 +117,23 @@ quality.onDowngrade = () => {
   ui.onExit(doExit);
 
   router.attachKeyboardMouse(canvas);
-  if (quality.isMobile || 'ontouchstart' in window) router.attachTouch(canvas);
+  const touch = quality.isMobile || 'ontouchstart' in window;
+  if (touch) router.attachTouch(canvas);
+  controlMode = touch ? 'touch' : 'keys';
   if (mode === 'hands') {
     ui.setHint('starting hand tracking…');
     try {
       const { startHands } = await import('./hands.js');
       hands = await startHands(router, ui.glyphEl);
-      ui.setHint('✋ steer · ✊ dive · 🤏 pick · 🖐 hold to exit');
+      controlMode = 'hands';
+      ui.setHint('');
     } catch (e) {
       console.warn('hand tracking failed, falling back:', e);
       ui.setHint('hand tracking unavailable — keys/touch active');
+      setTimeout(() => ui.setHint(''), 5000);
     }
-  } else {
-    ui.setHint('scroll or pinch to descend into the field');
   }
-  setTimeout(() => { if (!ui.bubbleOpen) ui.setHint(''); }, 9000);
+  ui.setLegend(LEGENDS[controlMode]);
   running = true;
 })();
 
@@ -141,18 +154,28 @@ renderer.setAnimationLoop(() => {
   audio.motion(avatar.state.speed);
   quality.govern(dt);
 
-  // proximity to question flowers (only when descended)
-  if (running && avatar.state.dive > 0.4) {
-    nearFlower = -1;
-    let best = 36; // 6 units squared
-    field.questionPositions.forEach((p, i) => {
-      const d2 = tmp.subVectors(p, avatar.position).lengthSq();
-      if (d2 < best) { best = d2; nearFlower = i; }
-    });
-    if (nearFlower >= 0 && !ui.bubbleOpen) {
-      ui.setHint(visited.has(nearFlower) ? 'a question you already carry — pick to reread' : '🤏 / tap / E — pick the question');
-      hintShown = true;
-    } else if (hintShown) { ui.setHint(''); hintShown = false; }
+  // contextual guidance + proximity to question flowers
+  if (running && !ui.bubbleOpen && !exited) {
+    if (avatar.state.dive <= 0.4) {
+      nearFlower = -1;
+      ui.setHint(DIVE_HINTS[controlMode]); hintShown = true;
+    } else {
+      nearFlower = -1;
+      let best = 36; // 6 units squared
+      field.questionPositions.forEach((p, i) => {
+        const d2 = tmp.subVectors(p, avatar.position).lengthSq();
+        if (d2 < best) { best = d2; nearFlower = i; }
+      });
+      if (nearFlower >= 0) {
+        ui.setHint(visited.has(nearFlower) ? 'a question you already carry — pick to reread'
+          : (controlMode === 'hands' ? '🤏 pinch — pick the question' : controlMode === 'touch' ? 'tap — pick the question' : 'E — pick the question'));
+        hintShown = true;
+      } else if (Math.abs(avatar.state.speed) < 0.2 && visited.size === 0) {
+        ui.setHint(controlMode === 'hands' ? 'move your palm — walk toward a glowing flower'
+          : controlMode === 'touch' ? 'drag — walk toward a glowing flower' : 'WASD — walk toward a glowing flower');
+        hintShown = true;
+      } else if (hintShown) { ui.setHint(''); hintShown = false; }
+    }
   } else nearFlower = -1;
 
   post.render(scene, camera, dt, t, avatar.state.speed + avatar.state.diveVel * 4);

@@ -44,12 +44,15 @@ export class UI {
     for (const line of BOOT_LINES) {
       const el = document.createElement('div');
       log.appendChild(el);
-      for (let i = 0; i <= line.length; i += 2) {
-        el.textContent = line.slice(0, i);
-        await new Promise(r => setTimeout(r, 6));
+      // background tabs throttle timers — don't make a hidden tab type for 30s
+      if (!document.hidden) {
+        for (let i = 0; i <= line.length; i += 6) {
+          el.textContent = line.slice(0, i);
+          await new Promise(r => setTimeout(r, 14));
+        }
+        await new Promise(r => setTimeout(r, 70));
       }
       el.textContent = line;
-      await new Promise(r => setTimeout(r, 90));
     }
     $('tier-report').textContent =
       `detected tier: ${tierName}` + (canHands ? ' · camera available for hand tracking' : ' · touch/keyboard mode');
@@ -71,6 +74,7 @@ export class UI {
 
   // ---- HUD ----
   setCounter(n, total) { $('counter').textContent = `${n}/${total}`; }
+  setLegend(t) { $('legend').textContent = t; }
   setHint(t) { $('hint').textContent = t; }
   get glyphEl() { return $('gesture-glyph'); }
   onMute(cb) {

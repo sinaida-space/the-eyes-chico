@@ -71,13 +71,16 @@
 
 <!-- HUD -->
 <div id="hud" class="hidden">
-  <span id="counter">0/50</span>
-  <span id="hint"></span>
-  <span id="gesture-glyph"></span>
-  <span class="hud-right">
-    <button id="btn-mute" class="btn mini">SOUND: ON</button>
-    <button id="btn-exit" class="btn mini">EXIT</button>
-  </span>
+  <div id="hud-bar">
+    <span id="counter">0/50</span>
+    <span id="gesture-glyph"></span>
+    <span id="legend"></span>
+    <span class="hud-right">
+      <button id="btn-mute" class="btn mini">SOUND: ON</button>
+      <button id="btn-exit" class="btn mini">EXIT</button>
+    </span>
+  </div>
+  <div id="hint-row"><span id="hint"></span></div>
 </div>
 
 <!-- question bubble -->
