@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "eyes-chico",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "4791", "--bind", "127.0.0.1"],
+      "port": 4791
+    }
+  ]
+}
