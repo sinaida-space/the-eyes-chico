@@ -25,6 +25,21 @@
 
 <!-- terminal splash -->
 <div id="splash" class="term">
+  <div id="preconsent" class="hidden">
+    <pre id="eye" class="ascii-eye" aria-hidden="true"></pre>
+    <svg id="ecg" viewBox="0 0 600 60" preserveAspectRatio="none" aria-hidden="true">
+      <g id="ecg-scroll">
+        <path id="ecg-a" class="ecg-path" d="M0,30 H600"/>
+        <path id="ecg-b" class="ecg-path" d="M0,30 H600" transform="translate(600,0)"/>
+      </g>
+    </svg>
+    <div id="consent-log"></div>
+    <div id="consent-row" class="hidden">
+      <p class="dim tiny"><a href="privacy.html" target="_blank">privacy policy</a></p>
+      <button id="consent-yes" class="btn">ACCEPT</button>
+      <button id="consent-no" class="btn dim">DECLINE — the field will not remember you</button>
+    </div>
+  </div>
   <div id="bootlog"></div>
   <div id="splash-body" class="hidden">
     <pre class="ascii">
@@ -79,15 +94,6 @@
     <p class="dim tiny">hand tracking downloads a vision model from a CDN and uses your camera.
     all processing stays in your browser. see <a href="privacy.html" target="_blank">privacy</a>.</p>
   </div>
-</div>
-
-<!-- consent banner -->
-<div id="consent" class="hidden">
-  <p>C:\&gt; this site stores your progress in your browser (localStorage) and, only if you
-  choose hand tracking, reads your camera — locally, never uploaded. no analytics,
-  no third-party cookies. <a href="privacy.html" target="_blank">privacy policy</a></p>
-  <button id="consent-yes" class="btn">ACCEPT</button>
-  <button id="consent-no" class="btn dim">DECLINE (no saving)</button>
 </div>
 
 <!-- HUD -->
