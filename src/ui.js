@@ -11,11 +11,70 @@ const BOOT_LINES = [
   'C:\\> run the_eyes_chico.exe',
 ];
 
+const CONSENT_LINES = [
+  'C:\\> this field stores your progress in this browser (localStorage).',
+  'C:\\> if you choose hand tracking later, your camera is read locally — never uploaded.',
+  'C:\\> no analytics. no third-party cookies.',
+  'C:\\> AWAITING CONSENT',
+];
+
+const EYE_HALF = [
+  '  ▄▄▀▀▀▀▀▀▀▀▄▄',
+  '▄▀▄▄▄▄▄▄▄▄▄▄▄▄▀▄',
+  '█    ▄████▄    █',
+  '▀▄   ▀▀▀▀▀▀   ▄▀',
+  '  ▀▀▄▄▄▄▄▄▄▄▀▀',
+].join('\n');
+
+const EYE_CLOSED = [
+  '  ▄▄▀▀▀▀▀▀▀▀▄▄',
+  '▄▀            ▀▄',
+  '█ ▄▄▄▄▄▄▄▄▄▄▄▄ █',
+  '▀▄            ▄▀',
+  '  ▀▀▄▄▄▄▄▄▄▄▀▀',
+].join('\n');
+
 export class UI {
   constructor() {
     this.consented = null; // null = undecided, true/false
     this.storageOK = false;
+    this._eyeTimer = null;
     this.initFullscreen();
+  }
+
+  // ---- typewriter ----
+  async typeLine(containerEl, text) {
+    const el = document.createElement('div');
+    containerEl.appendChild(el);
+    // background tabs throttle timers — don't make a hidden tab type for 30s
+    if (!document.hidden) {
+      for (let i = 0; i <= text.length; i += 6) {
+        el.textContent = text.slice(0, i);
+        await new Promise(r => setTimeout(r, 14));
+      }
+      await new Promise(r => setTimeout(r, 70));
+    }
+    el.textContent = text;
+    return el;
+  }
+
+  // ---- ASCII eye ----
+  _setEye(frame) { const el = $('eye'); if (el) el.textContent = frame; }
+
+  _startEyeBlink(defaultFrame, minMs, maxMs, closedMs) {
+    clearTimeout(this._eyeTimer);
+    this._setEye(defaultFrame);
+    const schedule = () => {
+      const delay = minMs + Math.random() * (maxMs - minMs);
+      this._eyeTimer = setTimeout(() => {
+        this._setEye(EYE_CLOSED);
+        this._eyeTimer = setTimeout(() => {
+          this._setEye(defaultFrame);
+          schedule();
+        }, closedMs);
+      }, delay);
+    };
+    schedule();
   }
 
   // ---- fullscreen ----
@@ -39,23 +98,48 @@ export class UI {
   }
 
   // ---- consent ----
-  initConsent() {
+  async initConsent() {
     let prev = null;
     try { prev = localStorage.getItem('eyes-consent'); } catch (e) {}
     if (prev === 'yes') { this.consented = true; this.storageOK = true; return Promise.resolve(); }
     if (prev === 'no') { this.consented = false; return Promise.resolve(); }
-    $('consent').classList.remove('hidden');
+
+    $('preconsent').classList.remove('hidden');
+    this._startEyeBlink(EYE_HALF, 2000, 6000, 140);
+
+    const log = $('consent-log');
+    for (const line of CONSENT_LINES) {
+      const el = await this.typeLine(log, line);
+      if (line === CONSENT_LINES[CONSENT_LINES.length - 1]) {
+        const cursor = document.createElement('span');
+        cursor.className = 'cursor';
+        cursor.textContent = '█';
+        el.appendChild(cursor);
+      }
+    }
+    $('consent-row').classList.remove('hidden');
+
     return new Promise(res => {
-      $('consent-yes').onclick = () => {
-        this.consented = true; this.storageOK = true;
-        try { localStorage.setItem('eyes-consent', 'yes'); } catch (e) {}
-        $('consent').classList.add('hidden'); res();
+      const finish = accepted => {
+        removeEventListener('keydown', onKey);
+        if (accepted) {
+          this.consented = true; this.storageOK = true;
+          try { localStorage.setItem('eyes-consent', 'yes'); } catch (e) {}
+        } else {
+          this.consented = false;
+          try { localStorage.clear(); } catch (e) {}
+        }
+        clearTimeout(this._eyeTimer);
+        $('preconsent').classList.add('hidden');
+        res();
       };
-      $('consent-no').onclick = () => {
-        this.consented = false;
-        try { localStorage.clear(); } catch (e) {}
-        $('consent').classList.add('hidden'); res();
+      const onKey = e => {
+        if (e.code === 'KeyY') finish(true);
+        else if (e.code === 'KeyN') finish(false);
       };
+      $('consent-yes').onclick = () => finish(true);
+      $('consent-no').onclick = () => finish(false);
+      addEventListener('keydown', onKey);
     });
   }
 
@@ -63,17 +147,7 @@ export class UI {
   async runBoot(tierName, canHands, weak = false) {
     const log = $('bootlog');
     for (const line of BOOT_LINES) {
-      const el = document.createElement('div');
-      log.appendChild(el);
-      // background tabs throttle timers — don't make a hidden tab type for 30s
-      if (!document.hidden) {
-        for (let i = 0; i <= line.length; i += 6) {
-          el.textContent = line.slice(0, i);
-          await new Promise(r => setTimeout(r, 14));
-        }
-        await new Promise(r => setTimeout(r, 70));
-      }
-      el.textContent = line;
+      await this.typeLine(log, line);
     }
     $('tier-report').textContent =
       `detected tier: ${tierName}` + (canHands ? ' · camera available for hand tracking' : ' · touch/keyboard mode');
