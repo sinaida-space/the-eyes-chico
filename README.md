@@ -1,6 +1,7 @@
 # the eyes, chico
 
 An interactive web installation by [Sinaida](https://sinaida.eu) · [@sin.ai.da](https://www.instagram.com/sin.ai.da/)
+LIVE VERSION https://the-eyes-chico.sinaida.eu/
 
 A field of eyes, a field of poppies, a glowing figure you steer through it.
 Fifty of the flowers hold questions you can only answer in your own head —
