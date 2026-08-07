@@ -1,0 +1,15 @@
+the eyes, chico
+Copyright 2026 Sinaida Krivchenko (https://sinaida.eu)
+
+Licensed under the Apache License, Version 2.0. See LICENSE.
+
+SCOPE
+  The Apache License covers the SOURCE CODE in this repository.
+  It does NOT cover the artwork: visual design, shader output as an
+  artistic work, video, audio, imagery or written text. Those are
+  licensed separately in LICENSE-ARTWORK.
+
+
+THIRD-PARTY
+  This repository contains code by other authors, used under their own
+  licenses and credited at each site of use. See THIRD-PARTY.md.
