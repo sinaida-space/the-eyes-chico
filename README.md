@@ -28,3 +28,12 @@ Open http://localhost:4791. Deployable as-is to GitHub Pages.
 - No analytics, no cookies; localStorage only, behind consent
 
 © Sinaida Krivchenko. Artwork and text all rights reserved.
+
+## License
+
+Code: Apache 2.0, see [LICENSE](LICENSE).
+Artwork, video and text: all rights reserved. The painting is by Alisa Feer
+and is not licensed by this repository; see [LICENSE-ARTWORK](LICENSE-ARTWORK).
+Third-party code: [THIRD-PARTY.md](THIRD-PARTY.md).
+
+© 2026 Sinaida Krivchenko · [sinaida.eu](https://sinaida.eu)

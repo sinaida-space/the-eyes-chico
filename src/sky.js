@@ -3,9 +3,16 @@
 // Rendered into a low-res render target each frame and used as scene.background,
 // so the march cost is independent of screen resolution.
 
-// Based on source that has SPDX-License-Identifier: MIT
-// Source Copyright (c) 2026 @YoheiNishitsuji
-// [LICENSE] https://opensource.org/licenses/MIT
+// THIRD-PARTY NOTICE
+// The log-polar domain-warp raymarch loop below (the `for (q.yz -= 1.0; ...)`
+// block and its inner turbulence sum) is based on a shader by Yohei Nishitsuji
+// (@YoheiNishitsuji), used under the MIT License.
+//   Source Copyright (c) 2026 Yohei Nishitsuji
+//   SPDX-License-Identifier: MIT
+//   https://opensource.org/licenses/MIT
+// Everything from the palette clamp downward — the red/bone tonemap, the
+// horizon haze, the star field and the u_calm finale — is original to this
+// work and licensed under the terms in ../LICENSE. See ../THIRD-PARTY.md.
 
 import * as THREE from 'three';
 

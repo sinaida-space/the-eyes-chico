@@ -2,6 +2,10 @@
 // and the 50 question flowers. Eyes track the avatar in-shader.
 import * as THREE from 'three';
 
+// hash13 below is from "Hash without Sine" by Dave Hoskins
+// https://www.shadertoy.com/view/4djSRW
+// Copyright (c) 2014 David Hoskins. SPDX-License-Identifier: MIT
+// The value-noise and fBm built on top of it are original to this work.
 const GLSL_NOISE = /* glsl */`
 float hash13(vec3 p){ p = fract(p*0.1031); p += dot(p, p.zyx+31.32); return fract((p.x+p.y)*p.z); }
 float noise3(vec3 p){
