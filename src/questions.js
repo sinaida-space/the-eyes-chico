@@ -1,5 +1,4 @@
-// 50 questions for one person. Inspired by Arthur Aron's 36 — stripped of every
-// "you and your partner"; the only other person in the room is you.
+// 50 questions for one person.
 // Arc: surface → middle → marrow.
 export const QUESTIONS = [
   // I. SURFACE
