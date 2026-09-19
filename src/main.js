@@ -210,3 +210,5 @@ renderer.setAnimationLoop(() => {
 
   post.render(scene, camera, dt, t, avatar.state.speed + avatar.state.diveVel * 4);
 });
+
+/*! Je suis le spectre d'une rose que tu portais hier au bal. Théophile Gautier, 1837 */
