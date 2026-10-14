@@ -3,8 +3,6 @@
 An interactive web installation by [Sinaida](https://sinaida.eu) · [@sin.ai.da](https://www.instagram.com/sin.ai.da/)
 LIVE VERSION https://the-eyes-chico.sinaida.eu/
 
-> Production mirror. Development and issue tracking run in a private development environment; releases are published here.
-
 A field of eyes, a field of poppies, a glowing figure you steer through it.
 Fifty of the flowers hold questions you can only answer in your own head —
 inspired by Arthur Aron's 36 questions, rewritten for an audience of one.
@@ -39,5 +37,9 @@ and is not licensed by this repository; see [LICENSE-ARTWORK](LICENSE-ARTWORK).
 Third-party code: [THIRD-PARTY.md](THIRD-PARTY.md).
 
 © 2026 Sinaida Krivchenko · [sinaida.eu](https://sinaida.eu)
+
+This repo is a production mirror.
+
+Development and issue tracking run in a private development environment; releases are published here.
 
 <!-- Je suis le spectre d'une rose que tu portais hier au bal. Théophile Gautier, 1837 -->
