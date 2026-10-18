@@ -35,6 +35,12 @@ Loaded at runtime from a CDN, not bundled here.
 Copyright Google LLC. Licensed under Apache License 2.0.
 https://github.com/google-ai-edge/mediapipe
 
+## VT323 — `assets/vt323.woff2`
+
+Copyright 2011, The VT323 Project Authors.
+Licensed under the SIL Open Font License 1.1. Full text in
+assets/OFL-VT323.txt.
+
 ## The painting
 
 Not third-party code, but third-party work: the painting is by Alisa Feer
