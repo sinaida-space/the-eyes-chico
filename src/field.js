@@ -251,6 +251,7 @@ export function createField(scene, quality) {
   retier();
 
   return {
+    group,
     questionPositions,
     _eyes: eyes, // instance data exposed for the teaser renderer
     markVisited(i, on = true) { visited[i] = on ? 1 : 0; aVisited.needsUpdate = true; },

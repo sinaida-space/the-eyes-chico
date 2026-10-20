@@ -24,6 +24,12 @@ const camera = new THREE.PerspectiveCamera(46, innerWidth / innerHeight, 0.1, 60
 const sky = createSky(renderer, quality);
 scene.background = sky.texture;
 const field = createField(scene, quality);
+// the field stays hidden (sky only) until the player has entered, then rises from below
+field.group.visible = false;
+field.group.position.y = -30;
+let riseStart = -1;
+const RISE_MS = 2600;
+function riseField() { field.group.visible = true; riseStart = performance.now(); }
 const avatar = createAvatar(scene, camera, quality);
 const post = createPost(renderer, quality);
 const audio = new AudioEngine();
@@ -86,8 +92,39 @@ async function openFlower(i) {
   if (visited.size === QUESTIONS.length) { ui.finale(); sky.setCalm(1); post.burst(1.5); }
 }
 
+// Hand tracking starts while the terminal splash is still up, so the camera prompt
+// and model download happen in the terminal's atmosphere and never over the field.
+const CROSSING_LINES = [
+  'C:\\> how are you feeling?',
+  'C:\\> the field is waking up.',
+  'C:\\> your hands will be the only thing it trusts.',
+  'C:\\> breathe. nothing is recorded.',
+  'C:\\> crossing over...',
+];
+async function wakeHands() {
+  // full-screen crossing: the camera prompt and the model download both happen behind it
+  const el = document.createElement('div');
+  el.id = 'crossing';
+  el.innerHTML = '<div class="line"></div><div class="sub">allow the camera when your browser asks<span class="cursor">_</span></div>';
+  document.body.appendChild(el);
+  const line = el.querySelector('.line');
+  let n = 0;
+  const show = () => {
+    line.classList.add('fade');
+    setTimeout(() => { line.textContent = CROSSING_LINES[n % CROSSING_LINES.length]; n++; line.classList.remove('fade'); }, 600);
+  };
+  line.textContent = CROSSING_LINES[n++];
+  requestAnimationFrame(() => el.classList.add('on'));
+  const timer = setInterval(show, 3200);
+  const minShow = new Promise(r => setTimeout(r, 2600)); // never a flash
+  await Promise.all([startHandsFlow(), minShow]);
+  clearInterval(timer);
+  // the splash is hidden by the caller; fade out once the field is about to rise
+  el.classList.remove('on');
+  setTimeout(() => el.remove(), 900);
+}
+
 async function startHandsFlow() {
-  ui.setHint('starting hand tracking…');
   try {
     const { startHands } = await import('./hands.js');
     hands = await startHands(router, ui.glyphEl);
@@ -110,8 +147,8 @@ async function doExit() {
   if (choice === 'welcome') {
     ui.showSplash();
     const mode = await ui.waitForEnter();
+    if (mode === 'hands' && !hands) await wakeHands();
     ui.hideSplash();
-    if (mode === 'hands' && !hands) await startHandsFlow();
   }
   exited = false; running = true;
 }
@@ -143,6 +180,7 @@ quality.onDowngrade = () => {
     ui.initTouchChoice(saved);
   }
   const mode = await ui.waitForEnter();
+  if (mode === 'hands') await wakeHands();
   ui.hideSplash();
   audio.start();
   ui.onMute(m => audio.setMuted(m));
@@ -158,8 +196,8 @@ quality.onDowngrade = () => {
     }
     if (ui.storageOK) { try { localStorage.setItem('eyes-touchmode', ui.touchMode); } catch (e) {} }
   } else controlMode = 'keys';
-  if (mode === 'hands') await startHandsFlow();
-  else ui.setLegend(LEGENDS[controlMode]);
+  if (mode !== 'hands') ui.setLegend(LEGENDS[controlMode]);
+  riseField();
   running = true;
 })();
 
@@ -175,6 +213,11 @@ renderer.setAnimationLoop(() => {
   const dt = Math.min(clock.getDelta(), 0.05);
   const t = clock.elapsedTime;
 
+  if (riseStart >= 0) {
+    const k = Math.min(1, (performance.now() - riseStart) / RISE_MS);
+    field.group.position.y = -30 * Math.pow(1 - k, 3); // ease-out cubic
+    if (k >= 1) riseStart = -1;
+  }
   sky.render(t);
   field.update(t);
   field.setAvatar(avatar.position);
