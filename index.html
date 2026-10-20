@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'wasm-unsafe-eval' https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/ 'sha256-+mly31C+QQSAeXrtrKLIXFjPzAin+3Nu2O5/lqJcZv8='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; media-src 'self' blob:; connect-src 'self' https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/ https://storage.googleapis.com/mediapipe-models/hand_landmarker/; worker-src 'self' blob:; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <title>the eyes, chico — an interactive installation by sinaida</title>
 <meta name="description" content="A field of eyes, a field of poppies, 50 questions you can only ask yourself. Interactive web installation by Sinaida.">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
@@ -51,6 +53,18 @@
     flowers glow — each one holds a question you can only answer in your own
     head. Nothing is recorded. The field only asks.</p>
 
+    <p id="touch-choice" class="hidden"><b>TOUCH CONTROLS:</b>
+      <button id="tc-swipe" class="btn mini">SWIPE</button>
+      <button id="tc-buttons" class="btn mini dim">ON-SCREEN BUTTONS</button></p>
+
+    <div id="enter-row">
+      <button id="btn-enter-hands" class="btn hidden">▶ ENTER WITH HAND TRACKING</button>
+      <button id="btn-enter" class="btn">▶ ENTER</button>
+      <button id="btn-fs" class="btn dim">⛶ FULLSCREEN</button>
+    </div>
+    <p class="dim tiny">hand tracking downloads a vision model from a CDN and uses your camera.
+    all processing stays in your browser. see <a href="privacy.html" target="_blank">privacy</a>.</p>
+
     <h3>// HOW TO MOVE</h3>
     <div id="controls-hand" class="hidden">
       <p><b>HAND TRACKING</b> (your camera, processed locally — nothing leaves this device)</p>
@@ -63,9 +77,6 @@
     <div id="controls-fallback">
       <p><b>TOUCH:</b> drag = steer · pinch = dive/rise · tap glowing flower = pick · tap = forget the open question<br>
       <b>KEYS/MOUSE:</b> WASD or arrows = steer · mouse wheel = dive/rise · E / click = pick · any key forgets the open question · ESC = exit menu</p>
-      <p id="touch-choice" class="hidden"><b>TOUCH CONTROLS:</b>
-        <button id="tc-swipe" class="btn mini">SWIPE</button>
-        <button id="tc-buttons" class="btn mini dim">ON-SCREEN BUTTONS</button></p>
     </div>
 
     <h3>// YOUR MACHINE</h3>
@@ -86,13 +97,6 @@
     light. Her work has been shown at the Russian Museum, St.&nbsp;Petersburg (2026,
     “Intuition of Space: Epiphany”).</p>
 
-    <div id="enter-row">
-      <button id="btn-enter-hands" class="btn hidden">▶ ENTER WITH HAND TRACKING</button>
-      <button id="btn-enter" class="btn">▶ ENTER</button>
-      <button id="btn-fs" class="btn dim">⛶ FULLSCREEN</button>
-    </div>
-    <p class="dim tiny">hand tracking downloads a vision model from a CDN and uses your camera.
-    all processing stays in your browser. see <a href="privacy.html" target="_blank">privacy</a>.</p>
   </div>
 </div>
 

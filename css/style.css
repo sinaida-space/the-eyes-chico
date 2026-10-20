@@ -22,7 +22,7 @@ a:hover { color: var(--bone); background: var(--red-dim); }
 .hidden { display: none !important; }
 .dim { color: #8a7f78; }
 .tiny { font-size: 14px; }
-h3 { color: var(--red); margin: 1.1em 0 .3em; font-weight: normal; letter-spacing: .06em; }
+h3 { color: var(--red); margin: 2em 0 .6em; font-weight: normal; letter-spacing: .06em; }
 b { color: var(--bone); }
 
 #gl { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
@@ -36,10 +36,13 @@ b { color: var(--bone); }
 }
 .term::after { /* scanlines */
   content: ''; position: fixed; inset: 0; pointer-events: none;
-  background: repeating-linear-gradient(0deg, transparent 0 2px, rgba(0,0,0,.22) 2px 4px);
+  background: repeating-linear-gradient(0deg, transparent 0 2px, rgba(0,0,0,.09) 3px 4px);
 }
-.term p { margin: .5em 0; max-width: 72ch; }
-.ascii { color: var(--red); font-size: 13px; line-height: 1.1; margin-bottom: .5em; }
+.term { line-height: 1.6; }
+.term p { margin: .9em 0; max-width: 72ch; }
+.ascii { /* logo sits above the scanline layer so its blocks stay solid */
+  position: relative; z-index: 1; color: var(--red); font-size: 15px; line-height: 1;
+  margin: 2.2em 0 1.2em; }
 #bootlog { white-space: pre-wrap; color: var(--bone); }
 #bootlog .ok { color: var(--red); }
 
@@ -54,7 +57,9 @@ b { color: var(--bone); }
 .btn:hover { background: var(--red); color: var(--black); }
 .btn.dim { color: #8a7f78; border-color: #4a4340; }
 .btn.mini { font-size: 15px; padding: .1em .6em; }
-#enter-row { margin-top: 1.4em; }
+#enter-row { margin: 2em 0 1em; }
+#enter-row .btn { margin: .6em 1em .6em 0; padding: .5em 1.2em; }
+#touch-choice { margin: 1.6em 0 .6em; }
 
 /* pre-consent: flatline + eye */
 #preconsent { margin-bottom: 1.2em; }
@@ -150,3 +155,15 @@ b { color: var(--bone); }
   .ascii-eye { font-size: 10px; }
   #legend { display: none; } /* the hint chip guides instead */
 }
+
+/* crossing screen: shown over the splash while the hand tracker wakes up */
+#crossing {
+  position: fixed; inset: 0; z-index: 50; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 1.4em; padding: 0 8vw; text-align: center;
+  background: var(--black); color: var(--red); font-family: inherit;
+  opacity: 0; transition: opacity .8s ease;
+}
+#crossing.on { opacity: 1; }
+#crossing .line { font-size: clamp(22px, 4vw, 44px); min-height: 2.6em; transition: opacity .6s ease; }
+#crossing .line.fade { opacity: 0; }
+#crossing .sub { color: var(--red-dim); font-size: clamp(16px, 2vw, 22px); }
