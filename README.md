@@ -22,7 +22,7 @@ Open http://localhost:4791. Deployable as-is to GitHub Pages.
 - Three.js (vendored in `/vendor`) — instanced eyeball/poppy field, GPU-particle avatar
 - Raymarched log-polar fBm nebula sky, rendered to a low-res target
 - Single-pass VHS/RGB-delay/glitch post-processing
-- MediaPipe Hands (lazy-loaded from CDN, opt-in) — palm steer / fist dive / pinch pick
+- MediaPipe Hands (lazy-loaded from `vendor/`, opt-in) — palm steer / fist dive / pinch pick
 - Web Audio generative drone + vinyl crackle, no audio files
 - Adaptive quality tiers (`?tier=0|1|2` to force) with a runtime FPS governor
 - No analytics, no cookies; localStorage only, behind consent
