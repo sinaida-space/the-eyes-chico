@@ -1,16 +1,17 @@
 // MediaPipe hand tracking → router events. Loaded lazily, only after the user
 // explicitly chooses hand mode. All processing stays in the browser; the model
-// files are fetched from jsDelivr/Google CDN (disclosed on splash + privacy page).
+// files are served from this site (vendor/mediapipe).
 // Grammar: ✋ palm = forward · ✊ fist = turn right · ✌️ peace = dive in/out ·
 //          👍 thumbs up = pick · 🤟 I-love-you = close the question.
-const CDN = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14';
+// Absolute URL of the vendored MediaPipe folder, relative to the site root.
+const LOCAL = new URL('../vendor/mediapipe/0.10.14', import.meta.url).href;
 
 export async function startHands(router, glyphEl) {
-  const vision = await import(`${CDN}/vision_bundle.mjs`);
-  const files = await vision.FilesetResolver.forVisionTasks(`${CDN}/wasm`);
+  const vision = await import(`${LOCAL}/vision_bundle.mjs`);
+  const files = await vision.FilesetResolver.forVisionTasks(`${LOCAL}/wasm`);
   const lm = await vision.HandLandmarker.createFromOptions(files, {
     baseOptions: {
-      modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task',
+      modelAssetPath: `${LOCAL}/models/hand_landmarker.task`,
       delegate: 'GPU',
     },
     numHands: 1, runningMode: 'VIDEO',

@@ -31,7 +31,9 @@ https://github.com/mrdoob/three.js
 
 ## MediaPipe Tasks Vision
 
-Loaded at runtime from a CDN, not bundled here.
+Version 0.10.14, vendored unchanged in `vendor/mediapipe/0.10.14/` (library and
+wasm files). The hand landmarker model in `models/` comes from
+storage.googleapis.com/mediapipe-models.
 Copyright Google LLC. Licensed under Apache License 2.0.
 https://github.com/google-ai-edge/mediapipe
 
